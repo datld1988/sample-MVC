@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+ 	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+ 	http://www.springframework.org/schema/aop
+ 	http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+ 	http://www.springframework.org/schema/context
+ 	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+ 	http://www.springframework.org/schema/tx
+ 	http://www.springframework.org/schema/tx/spring-tx.xsd
+ 	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-3.0.xsd
+	http://www.springframework.org/schema/data/jpa
+    http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+ ">
+ 	<task:annotation-driven/>
+ 	<context:property-placeholder location="classpath:config/server.properties"/>
+
+	<!-- Enable AspectJ style of Spring AOP 
+	-->
+	<bean id="loggingAspect" class="com.vtc.aspect.LoggingAspect" />
+ 	<aop:aspectj-autoproxy >
+ 		<aop:include name="loggingAspect" />
+ 	</aop:aspectj-autoproxy>
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<jpa:repositories base-package="com.vtc.mongorepositories"/>
+	<bean id="twilioService" class="com.vtc.service.TwilioService"/>
+	<bean id="sysConfig" class="com.vtc.config.SysConfig"/>
+	<bean id="mailService" class="com.vtc.service.impl.MailService">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+	<bean id="gcmSenderService" class="com.google.android.gcm.server.GcmSenderService">
+		<constructor-arg name="key" value="AIzaSyA-AN0RSyn6MNyD1LyX990zWFpANfoOXYE"/>
+		<constructor-arg name="senderId" value="902188990068"/>
+	</bean>
+
+	<bean id="registerServiceLocator" class="com.vtc.ws.v2.service.register.RegisterServiceLocator">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+	<bean id="authenServiceLocator" class="com.vtc.ws.v2.service.authen.AuthenServiceLocator">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+	<bean id="accountInfoServiceLocator" class="com.vtc.ws.v2.service.info.AccountInfoServiceLocator">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+	<bean id="accountPlusServiceLocator" class="com.vtc.ws.v2.service.plus.AccountPlusServiceLocator"></bean>
+	<bean id="accountUpdateServiceLocator" class="com.vtc.ws.v2.service.update.AccountUpdateServiceLocator"></bean>
+	<bean id="transactionServiceLocator" class="com.vtc.ws.v2.service.transaction.TransactionInput_TopupByCardServiceLocator">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+	<bean id="accountOAuthServiceLocator" class="com.vtc.ws.v2.service.authen.AccountOAuthServiceLocator">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+	<bean id="topupCardService" class="com.vtc.ws.v2.service.transaction.TransactionInput_TopupByCardServiceLocator">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+	<bean id="topupBankService" class="com.vtc.ws.v2.service.transaction.TransactionInput_TopupByBankServiceLocator">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+	<bean id="topupVtcpayService" class="com.vtc.ws.v2.service.transaction.TransactionInput_TopupByVTCPayServiceLocator">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+	<bean id="topupIAPService" class="com.vtc.ws.v2.service.transaction.TransactionInput_TopupByIAPServiceLocator">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+	<bean id="deductVcoinService" class="com.vtc.ws.v2.service.transaction.TransactionOutput_DeductVcoinServiceLocator">
+		<constructor-arg ref="sysConfig"/>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+		<property name="jpaDialect" ref="jpaDialect" />
+	</bean>
+
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceXmlLocation" value="classpath:META-INF/persistence.xml" />
+		<property name="persistenceUnitName" value="persistenceUnit" />
+		<!-- 
+		<property name="dataSource" ref="dataSource" />
+		 -->
+		<property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
+		<property name="jpaDialect" ref="jpaDialect" />
+	</bean>
+
+	<!-- 
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		
+		<property name="jdbcUrl" value="jdbc:mysql://117.103.207.105:3306/iot?useUnicode=true&amp;characterEncoding=UTF-8&amp;characterSetResults=UTF-8" />
+		<property name="user" value="iot1" />
+		<property name="password" value="Clpt@2016" />
+		<property name="minPoolSize" value="10" />
+        <property name="maxPoolSize" value="20" />
+        <property name="maxIdleTime" value="1000" />
+        <property name="testConnectionOnCheckin" value="true" />
+        <property name="maxIdleTimeExcessConnections" value="240" />
+        <property name="idleConnectionTestPeriod" value="300" />
+        <property name="maxStatements" value="0" />
+	</bean>
+	 -->
+	
+	<bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="database" value="HSQL" />
+		<property name="databasePlatform" value="org.hibernate.dialect.MySQL5Dialect" />
+	</bean>
+
+	<bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+	
+</beans>
+

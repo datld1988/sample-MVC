@@ -1,0 +1,11 @@
+{
+  "name": "APIs project SDK",
+  "version": "0.2.0",
+  "description": "APIs project SDK",
+  "title": "APIs project SDK",
+  "url" : "http://117.103.207.109:8080/sdk",
+  "template": {
+  	"withCompare": true,
+  	"withGenerator": true
+  }
+}

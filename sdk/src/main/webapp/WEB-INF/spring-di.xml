@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	        			http://www.springframework.org/schema/context 
+	        			http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	        			http://www.springframework.org/schema/data/mongo
+    					http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
+	<context:annotation-config/>
+	<context:property-placeholder location="classpath:ga/ga.properties"/>
+	
+	<bean id="gaConfig" class="com.vtc.config.GaConfig" />
+	
+	<!-- Resolve Dependency -->
+	<bean id="loadConfig" class="com.vtc.serviceproxy.impl.LoadConfigImpl"/>
+	<bean id="gaConfiguration" class="com.vtc.serviceproxy.impl.GaConfigurationImpl">
+		<!-- 
+		<constructor-arg ref="loadConfig"/>
+		 -->
+	</bean>
+	<bean id="gaBuilder" class="com.vtc.serviceproxy.impl.GaBuilderImpl">
+		<!-- <constructor-arg ref="gaConfiguration" /> -->
+	</bean>
+	<bean id="gaReport" class="com.vtc.serviceproxy.impl.GaReportImpl">
+		<!-- 
+		<constructor-arg ref="gaBuilder" />
+		 -->
+	</bean>
+	<bean id="gaTracking" class="com.vtc.serviceproxy.impl.GaTrackingImpl">
+		<!-- 
+		<constructor-arg ref="gaBuilder" />
+		 -->
+	</bean>
+	<bean id="facebookService" class="com.vtc.serviceproxy.impl.FacebookServiceImpl" />
+	<bean id="googleService" class="com.vtc.serviceproxy.impl.GoogleServiceImpl" />
+	<bean id="modelUtils" class="com.vtc.business.impl.ModelUtilsImpl" />
+	<bean id="trackingService" class="com.vtc.business.impl.TrackingServiceImpl" >
+		<!-- 
+		<constructor-arg ref="gaTracking"/>
+		<constructor-arg ref="modelUtils"/>
+		 -->
+	</bean>
+	<bean id="gameService" class="com.vtc.business.impl.GameServiceImpl"/>
+	<bean id="gamePaymentService" class="com.vtc.serviceproxy.impl.GamePaymentServiceImpl" /> 
+	<bean id="billingService" class="com.vtc.ws.v2.service.BillingService" />
+	<bean id="commonUtils" class="com.vtc.business.impl.CommonUtilsImpl" />
+	<bean id="accountService" class="com.vtc.business.impl.AccountServiceImpl" >
+	<!-- 
+		<constructor-arg ref="billingService" />
+		<constructor-arg ref="gaTracking" />
+		<constructor-arg ref="modelUtils" />
+	 -->
+	</bean>
+	<bean id="userService" class="com.vtc.business.impl.UserServiceImpl"></bean>
+	<bean id="appActivityService" class="com.vtc.business.impl.AppActivityServiceImpl"></bean>
+	<bean id="reportingGaService" class="com.vtc.business.impl.ReportingGaServiceImpl"></bean>
+	<bean id="transactionService" class="com.vtc.business.impl.TransactionServiceImpl" />
+	<bean id="serviceUtils" class="com.vtc.business.impl.ServiceUtilsImpl" />
+	
+	
+</beans>
